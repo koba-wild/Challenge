@@ -4,7 +4,7 @@ interface Element {
 
 class TextElement(val text: String) : Element {
     override fun render(builder: StringBuilder) {
-        builder.append("$text\n")
+        builder.append("$text")
     }
 }
 
@@ -22,6 +22,17 @@ abstract class Tag(val name: String) : Element {
     }
 
     override fun render(builder: StringBuilder) {
+        builder.append(name)
+        children.forEach {
+            it.render(builder)
+        }
+        when(name){
+            "*","**" -> builder.append("$name\n")
+            "<p>" -> builder.append("</p>")
+            "br" -> builder.append("\n")
+            else -> builder.append("\n")
+        }
+
 
     }
 
@@ -38,7 +49,7 @@ abstract class TagWithText(name: String) : Tag(name) {
     }
 }
 
-class MARKDOWN : TagWithText("markdown") {
+class MARKDOWN : TagWithText("\n") {
     fun h1(init: H1.() -> Unit) = initTag(H1(), init)
     fun h2(init: H2.() -> Unit) = initTag(H2(), init)
     fun p(init: P.() -> Unit) = initTag(P(), init)
@@ -47,8 +58,8 @@ class MARKDOWN : TagWithText("markdown") {
 
 }
 
-class H1 : TagWithText("h1")
-class H2 : TagWithText("h2")
+class H1 : TagWithText("#")
+class H2 : TagWithText("##")
 class Blockquotes : TagWithText("blockquotes")
 class OrderedList : TagWithText("orderedList")
 
@@ -56,12 +67,12 @@ class OrderedList : TagWithText("orderedList")
 abstract class PTag(name: String) : TagWithText(name) {
     fun bold(init: Bold.() -> Unit) = initTag(Bold(), init)
     fun italic(init: Italic.() -> Unit) = initTag(Italic(), init)
-    fun br(init: Br.() -> Unit) = initTag(Br(), init)
+    fun br() = "\n"
 }
 
-class P : PTag("p")
-class Bold : PTag("bold")
-class Italic : PTag("italic")
+class P : PTag("<p>")
+class Bold : PTag("**")
+class Italic : PTag("*")
 class Br : PTag("br")
 
 fun markdown(init: MARKDOWN.() -> Unit): MARKDOWN {
@@ -69,3 +80,4 @@ fun markdown(init: MARKDOWN.() -> Unit): MARKDOWN {
     markdown.init()
     return markdown
 }
+
