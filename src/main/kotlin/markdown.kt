@@ -29,7 +29,7 @@ abstract class Tag(val name: String) : Element {
         when(name){
             "*","**" -> builder.append("$name\n")
             "<p>" -> builder.append("</p>")
-            "br" -> builder.append("\n")
+            "" -> builder.append("\n\n")
             else -> builder.append("\n")
         }
 
@@ -53,27 +53,30 @@ class MARKDOWN : TagWithText("\n") {
     fun h1(init: H1.() -> Unit) = initTag(H1(), init)
     fun h2(init: H2.() -> Unit) = initTag(H2(), init)
     fun p(init: P.() -> Unit) = initTag(P(), init)
-    fun blockquotes(init: Blockquotes.() -> Unit) = initTag(Blockquotes(), init)
-    fun orderedList(init: OrderedList.() -> Unit) = initTag(OrderedList(), init)
+//    fun blockquotes(init: Blockquotes.() -> Unit) = initTag(Blockquotes(), init)
+//    fun orderedList(init: OrderedList.() -> Unit) = initTag(OrderedList(), init)
 
 }
 
 class H1 : TagWithText("#")
 class H2 : TagWithText("##")
-class Blockquotes : TagWithText("blockquotes")
-class OrderedList : TagWithText("orderedList")
+
 
 
 abstract class PTag(name: String) : TagWithText(name) {
     fun bold(init: Bold.() -> Unit) = initTag(Bold(), init)
     fun italic(init: Italic.() -> Unit) = initTag(Italic(), init)
-    fun br() = "\n"
+    fun br(init: Br.() -> Unit) = initTag(Br(), init)
+    fun blockquotes(init: Blockquotes.() -> Unit) = initTag(Blockquotes(), init)
+    fun orderedList(init: OrderedList.() -> Unit) = initTag(OrderedList(), init)
 }
 
 class P : PTag("<p>")
 class Bold : PTag("**")
 class Italic : PTag("*")
-class Br : PTag("br")
+class Br : PTag("")
+class Blockquotes : PTag(">")
+class OrderedList : PTag("1.")
 
 fun markdown(init: MARKDOWN.() -> Unit): MARKDOWN {
     val markdown = MARKDOWN()
